@@ -8,8 +8,8 @@ process.stdin.resume();
 
 const { SerialPort } = require('serialport')
 let myPort = new SerialPort({
-  path: "/dev/cu.usbmodem14101",
-  baudRate: 4800
+  path: "/dev/cu.usbmodem14301",
+  baudRate: 9600
 });
 var express = require('express'),
   app = express(),
@@ -25,11 +25,27 @@ var express = require('express'),
 //   led = new five.Led(13);
 // });
 
-app.get('/led/:mode', function (req, res) {
-  myPort.write("E1", ()=>{
-    myPort.drain();
+
+/**
+ * DECODE Code
+ * 
+ * E = Event                                            [0]
+ * A-Z = Event Name (ID)                                [1]
+ * 1-3 = Länge MS Zeit --> 3 = Hunderter = z.B. 100     [2]
+ * 1-999 = MS Speed                                     [3], [4], [5]
+ */
+
+app.get('/effect/:effect', function (req, res) {
+  myPort.write(req.params.effect+"\n", ()=>{
+    myPort.on('data', (data) => { 
+      console.log(data)
+      // resolve(data)
+      myPort.drain();
+      
+    })
+    
   });
-  res.status(200).send("OK")
+  res.status(200).send("EFFEKT DONE.");
 });
 
 app.listen(port, function () {

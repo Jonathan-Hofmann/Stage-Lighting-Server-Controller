@@ -1,7 +1,7 @@
 #include <FastLED.h>
 
 // How many leds in your strip?
-#define NUM_LEDS 6
+#define NUM_LEDS 18
 
 // For led chips like WS2812, which have a data line, ground, and power, you just
 // need to define DATA_PIN.  For led chipsets that are SPI based (four wires - data, clock,
@@ -14,16 +14,20 @@
 CRGB leds[NUM_LEDS];
 int incomingByte = 0;
 
+const unsigned int MAX_MESSAGE_LENGTH = 12;
 
 void setup() { 
-  Serial.begin(4800);
+  Serial.begin(9600);
   FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
   //randomSeed(analogRead(0));
 }
 
 void loop() { 
-  oneByOne(100);
+  // Serial.println("Animation done.");
+  // oneByOne(100);
   // specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
+  // randomMultiple(NUM_LEDS, 200);
+  
   // shutter(50);
   // Serial.read();
   // if (Serial.available() > 0) {
@@ -38,6 +42,62 @@ void loop() {
 
   //   // if()
   // }
+
+  //Check to see if anything is available in the serial receive buffer
+ while (Serial.available() > 0)
+ {
+   //Create a place to hold the incoming message
+   static char message[MAX_MESSAGE_LENGTH];
+   static unsigned int message_pos = 0;
+
+   //Read the next available byte in the serial receive buffer
+   char inByte = Serial.read();
+
+   //Message coming in (check not terminating character) and guard for over message size
+   if ( inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH - 1) )
+   {
+     //Add the incoming byte to our message
+     message[message_pos] = inByte;
+     message_pos++;
+   }
+   //Full message received...
+   else
+   {
+     //Add null character to string
+     message[message_pos] = '\0';
+
+     //Print the message (or do other things)
+
+      switch(message[1]){
+        case 'A':
+          specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
+          Serial.print("D");
+          break;
+        case 'B':
+          oneByOne(100);
+          break;
+        case 'C':
+          randomMultiple(NUM_LEDS, 100);
+          break;
+        case 'D':
+          shutter(100);
+          break;
+        default: 
+          shutter(200);
+          break;
+      }
+     
+      // if(message[1] == 'A'){
+      //   specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
+      // } else{
+        
+      // }
+
+     //Reset for the next message
+     message_pos = 0;
+   }
+ }
+
 }
 
 void specialOne(int speed, CRGB specialColor, CRGB mainColor){

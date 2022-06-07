@@ -14,17 +14,17 @@ function App() {
   return (
     <div className="App">
       {/* <MainGrid/> */}
-      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/led/off")}}>
-        LED AUS
+      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/effect/EA")}}>
+        Effekt 1
       </Button>
-      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/led/on")}}>
-        LED AN
+      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/effect/EB")}}>
+        Effekt 2
       </Button>
-      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/led/blink")}}>
-        LED BLINK
+      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/effect/EC")}}>
+        Effekt 3
       </Button>
-      <Button sx={{margin: '10px'}} variant='contained' color='error' onClick={()=>{callURL("http://localhost:8000/led/stop")}}>
-        LED STOP
+      <Button sx={{margin: '10px'}} onClick={()=>{callURL("http://localhost:8000/effect/ED")}}>
+        Effekt 4
       </Button>
     </div>
   );
