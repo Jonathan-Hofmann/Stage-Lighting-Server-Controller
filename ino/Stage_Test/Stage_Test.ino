@@ -1,5 +1,4 @@
 #include <FastLED.h>
-
 // How many leds in your strip?
 #define NUM_LEDS 18
 
@@ -10,6 +9,9 @@
 #define DATA_PIN 3
 #define CLOCK_PIN 13
 
+#define BRIGHTNESS 255   /* Control the brightness of your leds */
+#define SATURATION 255   /* Control the saturation of your leds */
+
 // Define the array of leds
 CRGB leds[NUM_LEDS];
 int incomingByte = 0;
@@ -19,88 +21,251 @@ const unsigned int MAX_MESSAGE_LENGTH = 12;
 void setup() { 
   Serial.begin(9600);
   FastLED.addLeds<APA102, DATA_PIN, CLOCK_PIN, RGB>(leds, NUM_LEDS);  // BGR ordering is typical
-  //randomSeed(analogRead(0));
+  randomSeed(analogRead(0));
 }
 
-void loop() { 
-  // Serial.println("Animation done.");
-  // oneByOne(100);
-  // specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
-  // randomMultiple(NUM_LEDS, 200);
-  
-  // shutter(50);
-  // Serial.read();
-  // if (Serial.available() > 0) {
-  //   Serial.print("Device Ready. Waiting for Data...");
-  //   // read the incoming byte:
-  //   incomingByte = Serial.read();
+void loop() {
 
-  //   // say what you got:
-  //   Serial.print("I received: ");
-  //   Serial.println(incomingByte, DEC);
-  //   Serial.println(incomingByte);
+  // flash_fadeIn(5);
 
-  //   // if()
-  // }
+  readData();
+// snowOnBlue(100, CRGB(255,255,255), CRGB(255,0,0));
+}
 
-  //Check to see if anything is available in the serial receive buffer
- while (Serial.available() > 0)
+
+
+void testType(int s){
+  Serial.println(" - Typ: Int");
+}
+void testType(char s){
+  Serial.println(" - Typ: Char");
+}
+void testType(bool s){
+  Serial.println(" - Typ: Boolean");
+}
+
+void readData(){
+  while (Serial.available() > 0)
  {
-   //Create a place to hold the incoming message
-   static char message[MAX_MESSAGE_LENGTH];
-   static unsigned int message_pos = 0;
+    //Create a place to hold the incoming message
+    static char message[MAX_MESSAGE_LENGTH];
+    static unsigned int message_pos = 0;
 
-   //Read the next available byte in the serial receive buffer
-   char inByte = Serial.read();
+    // for (int i = 0; i < MAX_MESSAGE_LENGTH; ++i){
+    //   message[i] = 'n';
+    // }
 
-   //Message coming in (check not terminating character) and guard for over message size
-   if ( inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH - 1) )
-   {
-     //Add the incoming byte to our message
-     message[message_pos] = inByte;
-     message_pos++;
-   }
-   //Full message received...
-   else
-   {
-     //Add null character to string
-     message[message_pos] = '\0';
+    //Read the next available byte in the serial receive buffer
+    char inByte = Serial.read();
 
-     //Print the message (or do other things)
+    //Message coming in (check not terminating character) and guard for over message size
+    if ( inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH - 1) )
+    {
+      //Add the incoming byte to our message
+      Serial.print(inByte);
+      message[message_pos] = inByte;
+      message_pos++;
+    }
+    //Full message received...
+    else
+    {
+      //Add null character to string
+      message[message_pos] = '\0';
 
-      switch(message[1]){
+      // decode message
+
+      char m[2];
+
+      int speed = String(message[4]).toInt()+(String(message[3]).toInt()*10)+(String(message[2]).toInt()*100);
+      int count = String(message[6]).toInt()+(String(message[5]).toInt()*10);
+
+      Serial.print(" | ");
+      Serial.print(speed);
+      Serial.print(" ms");
+      Serial.print(" | Loop: ");
+      Serial.print(count);
+      Serial.println(" x");
+
+      m[0] = message[0];
+      m[1] = message[1];
+
+      for(int i = 0; i < count; i++){
+        switch(m[1]){
         case 'A':
-          specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
-          Serial.print("D");
+          snowOnBlue(speed, CRGB(255,255,255), CRGB(255,0,0));
           break;
         case 'B':
-          oneByOne(100);
+          oneByOne(speed);
           break;
         case 'C':
-          randomMultiple(NUM_LEDS, 100);
+          randomMultiple(NUM_LEDS, speed);
           break;
         case 'D':
-          shutter(100);
+          shutter(speed);
+          break;
+        case 'E':
+          rainbow();
+          break;
+        case 'F':
+          rainbow_flash();
+          break;
+        case 'G':
+          leftRight(speed);
+          break;
+        case 'H':
+          block(speed);
+          break;
+        case 'I':
+          flash_fadeIn(speed);
+          break;
+        case 'J':
+          flash_fadeOut(speed);
+          break;
+        case 'K':
+          OnOff2nd(speed);
+          break;
+        case '-':
+          off();
           break;
         default: 
-          shutter(200);
+          errorReply();
           break;
+        }
       }
-     
-      // if(message[1] == 'A'){
-      //   specialOne(100, CRGB(255,255,255), CRGB(255,0,0));
-      // } else{
-        
-      // }
-
-     //Reset for the next message
-     message_pos = 0;
+      //Reset for the next message
+      message_pos = 0;
    }
  }
-
 }
 
-void specialOne(int speed, CRGB specialColor, CRGB mainColor){
+/**
+
+    EFFECTS
+
+*/
+
+void flash_fadeIn(int speed){
+  for (int j = 0; j < 255; j++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(255, SATURATION, j); /* The higher the value 4 the less fade there is and vice versa */ 
+    }
+    FastLED.show();
+    delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  }
+}
+
+void flash_fadeOut(int speed){
+  for (int j = 0; j < NUM_LEDS; j++) {
+    leds[j] = CHSV(255, SATURATION, 255); /* The higher the value 4 the less fade there is and vice versa */ 
+  }
+  for (int j = 255; j >= 0; j--) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(255, SATURATION, j); /* The higher the value 4 the less fade there is and vice versa */ 
+    }
+    FastLED.show();
+    delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  }
+}
+
+void block(int speed){
+  int size = 6;
+  int lastPos = 0;
+  for(int a = 0; a < NUM_LEDS-6; a++){
+      for (int b = 0; b < NUM_LEDS; b++) {
+        if(b > lastPos && b < (lastPos+6)){
+          leds[b] = CRGB(255,255,255);
+        } else{
+          leds[b] = CRGB(0,0,0);
+        }
+        
+      }
+      FastLED.show();
+    
+    ++lastPos;
+    delay(speed);
+  }
+}
+
+void leftRight(int speed){
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if(i < NUM_LEDS/2){
+      leds[i] = CRGB(0,0,0);
+    } else {
+      leds[i] = CRGB(255,255,255);
+    }
+  }
+  FastLED.show();
+  delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if(i < NUM_LEDS/2){
+      leds[i] = CRGB(255,255,255);
+    } else {
+      leds[i] = CRGB(0,0,0);
+    }
+  }
+  FastLED.show();
+  delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+}
+
+void OnOff2nd(int speed){
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if(i % 2 == 0){
+      leds[i] = CRGB(0,0,0);
+    } else {
+      leds[i] = CRGB(255,255,255);
+    }
+  }
+  FastLED.show();
+  delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  for (int i = 0; i < NUM_LEDS; i++) {
+    if(i % 2 == 0){
+      leds[i] = CRGB(255,255,255);
+    } else {
+      leds[i] = CRGB(0,0,0);
+    }
+  }
+  FastLED.show();
+  delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+}
+
+void rainbow(){
+  for (int j = 0; j < 255; j++) {
+    for (int i = 0; i < NUM_LEDS; i++) {
+      leds[i] = CHSV(i - (j * 2), SATURATION, BRIGHTNESS); /* The higher the value 4 the less fade there is and vice versa */ 
+    }
+    FastLED.show();
+    delay(25); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  }
+}
+
+void rainbow_flash(){
+  for (int j = 0; j < 255; j++) {
+    int onOfArr[NUM_LEDS];
+
+    for (int m = 0; m < NUM_LEDS; m++){
+      // Serial.println(random(2));
+      onOfArr[m] = random(2);
+    } 
+    for (int i = 0; i < NUM_LEDS; i++) {
+      if(onOfArr[i] == 1){
+        leds[i] = CHSV(i - (j * 4), SATURATION, BRIGHTNESS);
+      } else{
+        leds[i] = CHSV(i - (j * 4), SATURATION, 0);
+      } /* The higher the value 4 the less fade there is and vice versa */ 
+    }
+    FastLED.show();
+    delay(60); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+  }
+}
+
+void errorReply(){
+  for (int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGB(0,0,255);
+  }
+  FastLED.show();
+}
+
+void snowOnBlue(int speed, CRGB specialColor, CRGB mainColor){
   for (int i = 0; i < NUM_LEDS; i++){
     leds[i] = mainColor;
   }
@@ -112,6 +277,13 @@ void specialOne(int speed, CRGB specialColor, CRGB mainColor){
     FastLED.show();
     delay(speed);
   }
+}
+
+void off(){
+  for (int i = 0; i < NUM_LEDS; i++){
+    leds[i] = CRGB(0,0,0);
+  }
+  FastLED.show();
 }
 
 void oneByOne(int speed) {
