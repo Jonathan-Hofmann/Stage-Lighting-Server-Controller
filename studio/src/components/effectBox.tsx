@@ -1,4 +1,4 @@
-import { Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, Grid, Paper, Stack, TextField, Typography } from "@mui/material"
+import { Accordion, AccordionSummary, AccordionDetails, Box, Button, Divider, Grid, Paper, Stack, TextField, Typography, Skeleton } from "@mui/material"
 import axios from "axios";
 import React, { useEffect, useState } from "react"
 import { BiChevronDown } from "react-icons/bi";
@@ -57,23 +57,24 @@ export const EffectBox:React.FC<Effect> = (props) => {
 
     return(
         <Grid item xs={2}>
-            <Paper elevation={0} sx={{backgroundColor: '#f4f4f4', padding: '20px'}}>
+            <Paper elevation={0} sx={{backgroundColor: '#fafafa', padding: '20px', marginBottom: 0}}>
                 <Stack>
                     <Box sx={{display: 'flex', justifyContent: "space-between", marginBottom: '20px'}}>
                         <Typography fontWeight={600}>
                             {props.data.name}
                         </Typography>
-                        <Typography variant="body2">{aproxTime} sek.</Typography>
+                        {aproxTime === "0" ? <Skeleton width={'60px'}/> : <Typography variant="body2">{aproxTime} sek.</Typography>}
                     </Box>
-                    <Accordion elevation={0} sx={{backgroundColor: '#f4f4f4'}}>
+                    <Accordion elevation={0} sx={{backgroundColor: '#fafafa'}}>
                         <AccordionSummary
                             expandIcon={<BiChevronDown size={20} />}
                             aria-controls="panel1a-content"
                             id="panel1a-header"
+                            sx={{padding: 0}}
                             >
                         <Typography>Einstellungen</Typography>
                         </AccordionSummary>
-                        <AccordionDetails>
+                        <AccordionDetails sx={{padding: 0}}>
                             <Stack>
                                 <TextField size="small" value={loop} onChange={(e)=>{setLoop(parseInt(e.target.value))}} sx={{marginBottom: '15px', marginTop: '5px'}} type="number" id="outlined-basic" label="Wiederholungen" variant="outlined" />
                                 {props.data.speed != null ? <TextField size="small" value={speed} onChange={(e)=>{setSpeed(parseInt(e.target.value))}} sx={{marginBottom: '15px', marginTop: '5px'}} type="number" id="outlined-basic" label="Speed" variant="outlined" /> : <></>}

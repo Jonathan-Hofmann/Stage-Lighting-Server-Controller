@@ -2,88 +2,64 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { MainGrid } from './components/mainGrid';
-import { Button, Grid, Stack, Typography } from '@mui/material';
+import { Button, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import axios from 'axios';
 import { Box, Container } from '@mui/system';
 import { EffectBox, i_Effect } from './components/effectBox';
 import { Timeline } from './components/timeline';
 import { QueItem } from './components/queItem';
+import { effects, colors } from './constants/config';
+import { ColorBox } from './components/colorBox';
+import { PhotoshopPicker, SketchPicker } from 'react-color';
+import { ColorPickerMain } from './components/colorPicker';
+
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && (
+        <Box sx={{ p: 0 }}>
+          <Typography>{children}</Typography>
+        </Box>
+      )}
+    </div>
+  );
+}
+
+function a11yProps(index: number) {
+  return {
+    id: `simple-tab-${index}`,
+    'aria-controls': `simple-tabpanel-${index}`,
+  };
+}
 
 function App() {
 
-  const effects = [
-    {
-      name: 'Snow on Blue',
-      id: 'A',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'One By One',
-      id: 'B',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Random (Multiple)',
-      id: 'C',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Shutter',
-      id: 'D',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Rainbow',
-      id: 'E',
-      speed: null,
-      loop: 1,
-    },
-    {
-      name: 'Rainbow + Random flash',
-      id: 'F',
-      speed: null,
-      loop: 1,
-    },
-    {
-      name: 'Left Right',
-      id: 'G',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Block',
-      id: 'H',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Flash - Fade In',
-      id: 'I',
-      speed: 3,
-      loop: 1,
-    },
-    {
-      name: 'Flash - Fade Out',
-      id: 'J',
-      speed: 3,
-      loop: 1,
-    },
-    {
-      name: 'Every 2nd Switch',
-      id: 'K',
-      speed: 100,
-      loop: 1,
-    }
-  ]
+  
 
   const [que, updateQue] = useState<i_Effect[]>([]);
   const [aproxTime, setAproxTime] = useState(0.00);
 
   const [time, updateTime] = useState(0);
+
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
+  };
 
   let p_time = 0;
   let timer: NodeJS.Timeout | undefined;
@@ -179,13 +155,40 @@ function App() {
           }
         </>
       </Timeline>
-      <Grid spacing={3} sx={{padding: '30px'}} container>
-        {effects.map((effect)=>{
-          return(
-            <EffectBox addToQue={addEffectToQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: 100}}/>
-          )
-        })}
-      </Grid>
+
+      <Box sx={{ padding: '30px' }}>
+        <Box sx={{ borderBottom: 1, borderColor: '#f4f4f4' }}>
+          <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
+            <Tab label="Effekte" {...a11yProps(0)} />
+            <Tab label="Farben" {...a11yProps(1)} />
+            <Tab label="Andere" {...a11yProps(2)} />
+          </Tabs>
+        </Box>
+        <TabPanel value={value} index={0}>
+          <Grid spacing={3} sx={{marginTop: '0px'}} container>
+            {effects.map((effect)=>{
+              return(
+                <EffectBox addToQue={addEffectToQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: 100}}/>
+              )
+            })}
+          </Grid>
+        </TabPanel>
+        <TabPanel value={value} index={1}>
+          <Typography variant='h5' marginTop={"20px"}>Vordefinierte Farben</Typography>
+          <Grid spacing={3} sx={{marginTop: '0px'}} container>
+            {colors.map((effect)=>{
+                return(
+                  <ColorBox addToQue={addEffectToQue} data={{id: effect.id, name: effect.name, r: effect.r, g: effect.g, b: effect.b}}/>
+                )
+            })}
+          </Grid>
+          <Typography variant='h5' marginTop={"30px"}>Eigene Farbe</Typography>
+          <ColorPickerMain addToQue={addEffectToQue} data={{id: "C", name: "Custom"}}/>
+        </TabPanel>
+        <TabPanel value={value} index={2}>
+          Item Three
+        </TabPanel>
+      </Box>
       
     </>
   );

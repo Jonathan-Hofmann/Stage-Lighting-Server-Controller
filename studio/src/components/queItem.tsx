@@ -1,7 +1,9 @@
-import { Card, CardContent, CardHeader, Divider, IconButton, Paper, Stack, Typography } from "@mui/material";
+import { Card, CardContent, CardHeader, Divider, IconButton, Paper, Stack, Tooltip, Typography } from "@mui/material";
 import React from "react";
 import { i_Effect } from "./effectBox";
 import { BiPlus, BiTrash } from "react-icons/bi";
+import { BsController, BsTrash } from "react-icons/bs";
+import { calcTime } from "../helper/calcTimes";
 
 interface Props{
     data: i_Effect;
@@ -10,27 +12,24 @@ interface Props{
 }
 
 export const QueItem:React.FC<Props> = (props) => {
+    const aproxTime = calcTime(props.data.id, props.data.speed ?? 100, props.data.loop ?? 1);
     return(
-        <Card elevation={0} sx={{backgroundColor: '#f4f4f4', minWidth: '600px'}}>
-            <CardContent sx={{padding: '24px'}}>
-                <Stack flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"}>
-                    <Typography fontWeight={600}>
-                        {props.data.name}
-                    </Typography>
-                    <Divider orientation="vertical" sx={{margin: '0 10px', height: '20px', borderWidth: '1px'}} />
-                    <Typography>
-                        Speed: {props.data.speed} ms
-                    </Typography>
-                    <Divider orientation="vertical" sx={{margin: '0 10px', height: '20px', borderWidth: '1px'}} />
-                    <Typography>
-                        {props.data.loop} Wiederholung(en)
-                    </Typography>
-                    <Divider orientation="vertical" sx={{margin: '0 10px', height: '20px', borderWidth: '1px'}} />
-                    <IconButton onClick={()=>props.remove(props.index)} color="error" >
-                        <BiTrash/>
-                    </IconButton>
-                </Stack>
-            </CardContent>
-        </Card>
+        <Tooltip placement="top" arrow title={"Gesamte Zeit: "+aproxTime+" sek. | Länge: "+props.data.speed +"ms | Wdh: "+props.data.loop}>
+            <Card elevation={0} sx={{backgroundColor: '#ffffff', borderRadius: '100px'}}>
+                <CardContent sx={{padding: '13px !important'}}>
+                    <Stack flexDirection={"row"} justifyContent={"space-between"} alignItems={"center"} sx={{padding:0}}>
+                        <BsController size={20} style={{marginLeft: '10px'}}/>
+                        <Divider orientation="vertical" sx={{margin: '0 15px', height: '20px', borderWidth: '0.5px'}} />
+                        <Typography fontWeight={600}>
+                            {props.data.name}
+                        </Typography>
+                        <Divider orientation="vertical" sx={{margin: '0 10px', height: '20px', borderWidth: '1px'}} />
+                        <IconButton onClick={()=>props.remove(props.index)} color="error" size="small">
+                            <BsTrash/>
+                        </IconButton>
+                    </Stack>
+                </CardContent>
+            </Card>
+        </Tooltip>
     )
 }

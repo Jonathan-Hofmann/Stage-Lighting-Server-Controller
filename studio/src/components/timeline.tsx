@@ -14,7 +14,7 @@ export const Timeline:React.FC<Props> = (props) => {
     }, [props.aproxTime]);
     return(
         <Box sx={{padding: '30px'}}>
-            <Box sx={{borderRadius: '10px', backgroundColor: 'white', border: '2px solid #f4f4f4', padding: '20px', paddingBottom: '10px'}}>
+            <Box sx={{borderRadius: '10px', backgroundColor: '#f4f4f4', border: '2px solid #f4f4f4', padding: '20px', paddingBottom: '10px'}}>
                 <Stack direction={"row"} sx={{marginBottom: '20px'}} justifyContent={"space-between"}>
                     <Typography variant="h5">
                         Timeline
