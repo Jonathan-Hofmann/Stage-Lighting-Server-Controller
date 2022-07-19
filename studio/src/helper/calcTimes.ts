@@ -1,4 +1,4 @@
-const NUM_LEDS  = 18;
+const NUM_LEDS  = 65;
 
 export const calcTime = (id:string, speed: number, loop: number) => {
     let time = 0.00;

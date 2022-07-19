@@ -178,12 +178,12 @@ function App() {
           <Grid spacing={3} sx={{marginTop: '0px'}} container>
             {colors.map((effect)=>{
                 return(
-                  <ColorBox addToQue={addEffectToQue} data={{id: effect.id, name: effect.name, r: effect.r, g: effect.g, b: effect.b}}/>
+                  <ColorBox addToQue={addEffectToQue} data={{id: effect.id, name: effect.name, r1: effect.r1, g1: effect.g1, b1: effect.b1, r2: effect.r2, g2: effect.g2, b2: effect.b2}}/>
                 )
             })}
           </Grid>
-          <Typography variant='h5' marginTop={"30px"}>Eigene Farbe</Typography>
-          <ColorPickerMain addToQue={addEffectToQue} data={{id: "C", name: "Custom"}}/>
+          {/* <Typography variant='h5' marginTop={"30px"}>Eigene Farbe</Typography> */}
+          {/* <ColorPickerMain addToQue={addEffectToQue} data={{id: "C", name: "Custom"}}/> */}
         </TabPanel>
         <TabPanel value={value} index={2}>
           Item Three

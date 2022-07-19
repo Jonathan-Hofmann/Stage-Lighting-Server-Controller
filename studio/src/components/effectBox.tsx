@@ -47,7 +47,7 @@ export const EffectBox:React.FC<Effect> = (props) => {
             }
         }
 
-        axios.post("http://localhost:8000/effect/E"+props.data.id+m_speed+loops);
+        axios.post("http://localhost:8000/effect/E"+props.data.id+m_speed+loops+"1");
     }
 
     useEffect(()=>{
@@ -56,7 +56,7 @@ export const EffectBox:React.FC<Effect> = (props) => {
     }, [speed, loop]);
 
     return(
-        <Grid item xs={2}>
+        <Grid item xs={12} md={6} lg={4} xl={2}>
             <Paper elevation={0} sx={{backgroundColor: '#fafafa', padding: '20px', marginBottom: 0}}>
                 <Stack>
                     <Box sx={{display: 'flex', justifyContent: "space-between", marginBottom: '20px'}}>
