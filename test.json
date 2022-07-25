@@ -1,0 +1,243 @@
+{ 
+    "effects": [
+        {
+            "name": "Color change",
+            "id": "COLOR",
+            "speed": "000000255",
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Fade-In",
+            "id": "J",
+            "speed": 400,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },
+        {
+            "name": "Strobe multiple",
+            "id": "C",
+            "speed": 150,
+            "loop": 10
+        },
+        {
+            "name": "Strobe multiple",
+            "id": "C",
+            "speed": 100,
+            "loop": 10
+        },
+        {
+            "name": "Strobe multiple",
+            "id": "C",
+            "speed": 60,
+            "loop": 15
+        },
+        {
+            "name": "Fade-In",
+            "id": "I",
+            "speed": 900,
+            "loop": 1
+        },
+        {
+            "name": "Pause",
+            "id": "-",
+            "speed": 200,
+            "loop": 1
+        },{
+            "name": "Color change",
+            "id": "COLOR",
+            "speed": "255000255",
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Color change",
+            "id": "COLOR",
+            "speed": "255255255",
+            "loop": 1
+        },
+        {
+            "name": "Strobe",
+            "id": "D",
+            "speed": 100,
+            "loop": 4
+        },
+        {
+            "name": "Color change",
+            "id": "COLOR",
+            "speed": "255000255",
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "In-Out",
+            "id": "L",
+            "speed": 150,
+            "loop": 1
+        },
+        {
+            "name": "Out-In",
+            "id": "M",
+            "speed": 150,
+            "loop": 1
+        }
+    ]
+}

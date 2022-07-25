@@ -18,24 +18,43 @@
 CRGB leds[2][NUM_LEDS_WINGS];
 int incomingByte = 0;
 
-const unsigned int MAX_MESSAGE_LENGTH = 32;
+bool wingsInSync = false;
 
-void setup() { 
+CRGB mainColor = CRGB(255,0,0);
+CRGB specialColor = CRGB(0,0,0);
+
+bool showIdleAnim = true;
+
+const unsigned int MAX_MESSAGE_LENGTH = 255;
+
+void setup() {
   Serial.begin(9600);
   FastLED.addLeds<APA102, RIGHT_WING, CLOCK_PIN, RGB>(leds[0], NUM_LEDS_WINGS);  // BGR ordering is typical
   FastLED.addLeds<APA102, LEFT_WING, CLOCK_PIN, RGB>(leds[1], NUM_LEDS_WINGS);  // BGR ordering is typical
   randomSeed(analogRead(0));
 }
 
+uint8_t hue = 0;
+
 void loop() {
 
-  // flash_fadeIn(5);
-
   readData();
-// snowOnBlue(100, CRGB(255,255,255), CRGB(255,0,0));
+
+  if(showIdleAnim)
+    idleAnimation();
 }
 
-
+void idleAnimation(){
+  wingsInSync=true;
+  flash_fadeIn(400);
+  delay(200);
+  flash_fadeOut(600);
+  delay(300);
+  fromInnerToOut(300);
+  // delay(20);
+  fromOutToInner(300);
+  delay(300);
+}
 
 void testType(int s){
   Serial.println(" - Typ: Int");
@@ -46,12 +65,6 @@ void testType(char s){
 void testType(bool s){
   Serial.println(" - Typ: Boolean");
 }
-
-bool wingsInSync = false;
-
-CRGB mainColor = CRGB(0,0,0);
-CRGB specialColor = CRGB(0,0,0);
-
 void readData(){
   while (Serial.available() > 0)
  {
@@ -133,15 +146,24 @@ void readData(){
             case 'K':
               OnOff2nd(speed);
               break;
+            case 'L':
+              fromOutToInner(speed);
+              break;
+            case 'M':
+              fromInnerToOut(speed);
+              break;
+            case 'N':
+              randomMultipleRandomBrightness(NUM_LEDS_WINGS, speed);
+              break;
             case '-':
-              off();
+              off(speed);
               break;
             default: 
               errorReply();
               break;
           }
         }
-      } else {
+      } else if(m[0] == 'C') {
 
         // setting main color
         int mainR = String(message[3]).toInt()+(String(message[2]).toInt()*10)+(String(message[1]).toInt()*100);
@@ -156,11 +178,11 @@ void readData(){
         mainColor = CRGB(mainB, mainG, mainR);
         specialColor = CRGB(specialB, specialG, specialR);
 
-        // Serial.print("GOT MAIN COLOR:");
-        // Serial.println(mainColor);
+      } else {
 
-        // Serial.print("GOT SPECIAL COLOR:");
-        // Serial.println(specialColor);
+        // setting main color
+        showIdleAnim = convertIntoToBool(message[1]);
+
       }
       //Reset for the next message
       message_pos = 0;
@@ -189,32 +211,138 @@ bool convertIntoToBool(char inSync){
   else return(true);
 }
 
+CHSV RgbToHsv(int r, int g, int b, int brightness)
+{
+    int v, h, s;
+    unsigned char rgbMin, rgbMax;
+
+    rgbMin = r < g ? (r < b ? r : b) : (g < b ? g : b);
+    rgbMax = r > g ? (r > b ? r : b) : (g > b ? g : b);
+
+    v = rgbMax;
+    if (v == 0)
+    {
+        h = 0;
+        s = 0;
+        return CHSV(0,0,0);
+    }
+
+    s = 255 * long(rgbMax - rgbMin) / v;
+    if (s == 0)
+    {
+        h = 0;
+        return CHSV(h,s,v);
+    }
+
+    if (rgbMax == r)
+        h = 0 + 43 * (g - b) / (rgbMax - rgbMin);
+    else if (rgbMax == g)
+        h = 85 + 43 * (b - r) / (rgbMax - rgbMin);
+    else
+        h = 171 + 43 * (r - g) / (rgbMax - rgbMin);
+
+    // if(value < 256) 
+    //   v = 0;
+
+    return CHSV(h, s, brightness);
+}
+
 /**
 
     EFFECTS
 
 */
 
+void fromOutToInner(int speed){
+
+  for (int i = 0; i < 24; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+  FastLED.show();
+
+  delay(speed);
+
+  off(1);
+
+  for (int i = 24; i < 46; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+
+  FastLED.show();
+  delay(speed);
+  
+  off(1);
+
+  for (int i = 46; i < NUM_LEDS_WINGS; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+  FastLED.show();
+
+  delay(speed);
+
+  off(1);
+}
+
+void fromInnerToOut(int speed){
+  for (int i = 46; i < NUM_LEDS_WINGS; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+  FastLED.show();
+
+  delay(speed);
+
+  off(1);
+
+  for (int i = 24; i < 46; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+
+  FastLED.show();
+
+  delay(speed);
+  
+  off(1);
+
+  for (int i = 0; i < 24; i++)
+  {
+    showColor(i, 1, mainColor);
+  }
+  FastLED.show();
+
+  delay(speed);
+
+  off(1);
+
+}
+
 void flash_fadeIn(int speed){
-  for (int j = 0; j < 255; j++) {
+  int steps = 80;
+  for (int j = 0; j < steps; j++) {
+    if(j<20 && j>0)
+      continue;
     for (int i = 0; i < NUM_LEDS_WINGS; i++) {
-      showColor(i, 0, CHSV(255, SATURATION, j)); /* The higher the value 4 the less fade there is and vice versa */ 
+      showColor(i, 0, RgbToHsv(mainColor[0], mainColor[1], mainColor[2], j*3)); /* The higher the value 4 the less fade there is and vice versa */ 
     }
     FastLED.show();
-    delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+    delay(speed/100); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
   }
 }
 
 void flash_fadeOut(int speed){
-  for (int j = 0; j < NUM_LEDS_WINGS; j++) {
-    leds[0][j] = CHSV(255, SATURATION, 255); /* The higher the value 4 the less fade there is and vice versa */ 
-  }
-  for (int j = 255; j >= 0; j--) {
+  int steps = 80;
+  for (int j = steps; j >= 0; j--) {
+    if(j<20 && j>0)
+      continue;
     for (int i = 0; i < NUM_LEDS_WINGS; i++) {
-      showColor(i, 0, CHSV(255, SATURATION, j)); /* The higher the value 4 the less fade there is and vice versa */ 
+      showColor(i, 0, RgbToHsv(mainColor[0], mainColor[1], mainColor[2], j*3));
     }
     FastLED.show();
-    delay(speed); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
+    delay(speed/100); /* Change this to your hearts desire, the lower the value the faster your colors move (and vice versa) */
   }
 }
 
@@ -331,11 +459,12 @@ void snowOnBlue(int speed, CRGB specialColor_old, CRGB mainColor_old){
   }
 }
 
-void off(){
+void off(int speed){
   for (int i = 0; i < NUM_LEDS_WINGS; i++){
     showColor(i, 0, CRGB(0,0,0));
   }
   FastLED.show();
+  delay(speed);
 }
 
 void oneByOne(int speed) {
@@ -370,6 +499,33 @@ void randomMultiple(int max, int delay_ms) {
       showColor(i, 0, CRGB::Black);
     } else{
       showColor(i, 0, mainColor);
+    }
+  }
+  FastLED.show();
+  delay(delay_ms);
+  // Now turn the LED off, then pause
+  
+  for (int i = 0; i < NUM_LEDS_WINGS; i++){
+    showColor(i, 0, CRGB::Black);
+  }
+  FastLED.show();
+  delay(delay_ms);
+}
+
+void randomMultipleRandomBrightness(int max, int delay_ms) {
+  // Turn the LED on, then pause
+  int onOfArr[max];
+
+  for (int m = 0; m < max; m++){
+    // Serial.println(random(2));
+    onOfArr[m] = random(2);
+  } 
+
+  for (int i = 0; i < NUM_LEDS_WINGS; i++){
+    if(onOfArr[i]==0){
+      showColor(i, 0, CRGB::Black);
+    } else{
+      showColor(i, 0, RgbToHsv(mainColor[0], mainColor[1], mainColor[2], random(150)));
     }
   }
   FastLED.show();

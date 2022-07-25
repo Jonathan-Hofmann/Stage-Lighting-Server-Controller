@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { MainGrid } from './components/mainGrid';
-import { Button, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
+import { Button, FormControlLabel, FormGroup, Grid, Stack, Switch, Tab, Tabs, Typography } from '@mui/material';
 import axios from 'axios';
 import { Box, Container } from '@mui/system';
 import { EffectBox, i_Effect } from './components/effectBox';
@@ -96,34 +96,113 @@ function App() {
     p_time = 0;
   }
 
-  const startShow = () => {
-    console.log("STARTING QUE:");
-    console.log(que)
-    for (let i = 0; i < que.length; i++) {
-      const queElement = que[i];
-      
-      let m_speed = "100";
-      if(queElement.speed != null){
-          if (queElement.speed > 9 && queElement.speed <= 99) {
-              m_speed = "0"+queElement.speed.toString();
-          } else if(queElement.speed > 99) {
-              m_speed = queElement.speed.toString();
-          } else{
-              m_speed = "00"+queElement.speed.toString();
-          }
-      }
-
-      let loops = "01";
-      if(queElement.loop != null){
-        if (queElement.loop > 9) {
-          loops = queElement.loop.toString();
-        } else{
-          loops = "0"+queElement.loop.toString();
+  const playEffect = async (queElement: any) => {
+    return new Promise<void>((resolve, reject)=>{
+      if(queElement.id==="COLOR"){
+        axios.post("http://localhost:8000/color/C"+queElement.speed);
+        setTimeout(()=>{
+          resolve();
+        }, 50)
+      } else{
+        let m_speed = "100";
+        if(queElement.speed != null){
+            if (queElement.speed > 9 && queElement.speed <= 99) {
+                m_speed = "0"+queElement.speed.toString();
+            } else if(queElement.speed > 99) {
+                m_speed = queElement.speed.toString();
+            } else{
+                m_speed = "00"+queElement.speed.toString();
+            }
         }
 
-      }
-      axios.post("http://localhost:8000/effect/E"+queElement.id+m_speed+loops);
+        let loops = "01";
+        if(queElement.loop != null){
+          if (queElement.loop > 9) {
+            loops = queElement.loop.toString();
+          } else{
+            loops = "0"+queElement.loop.toString();
+          }
+
+        }
+        axios.post("http://localhost:8000/effect/E"+queElement.id+m_speed+loops);
+
+        let waitingTime = queElement.speed * queElement.loop;
+
+        if(queElement.id === "L" || queElement.id === "M"){
+          waitingTime = waitingTime*4;
+        }
+
+        if(queElement.id === "I" || queElement.id === "J"){
+          const t = queElement.speed as number / 100;
+          const _t = t*80;
+          waitingTime = _t;
+        }
+
+        if(queElement.id === "C"){
+          waitingTime = waitingTime*2;
+        }
+
+        console.log("Wait: "+waitingTime+"ms für "+queElement.id);
+
+        setTimeout(() => {
+          // waiting for effect to be done...
+          resolve()
+        }, waitingTime);
+      }     
+    })
+  }
+
+  const startShow = async () => {
+    console.log("STARTING QUE:");
+    console.log(que);
+    for (let i = 0; i < que.length; i++) {
+      
+      const queElement = que[i];
+
+      await playEffect(queElement);
+      
     }
+  }
+
+
+  const toggleIdleAnimation = (checked:boolean) => {
+    let v = 0;
+    if(checked=== true){
+      v=1;
+    } else {
+      v=0;
+    }
+    axios.post("http://localhost:8000/effect/I"+v);
+  }
+
+  const handleFile = (e:any) => {
+    const content = e.target.result;
+    const tmp_JSON = JSON.parse(content);
+    console.log(tmp_JSON);
+
+    const uploaded_que = [];
+    for (let i = 0; i < tmp_JSON.effects.length; i++) {
+      const effect = tmp_JSON.effects[i];
+      uploaded_que.push({
+        speed: effect.speed,
+        name: effect.name,
+        loop: effect.loop,
+        id: effect.id,
+        seconds: 0
+      })
+    }
+
+    updateQue(uploaded_que);
+
+    console.log(que);
+
+    // You can set content in state and show it in render.
+  }
+  
+  const handleChangeFile = (file: Blob) => {
+    let fileData = new FileReader();
+    fileData.onloadend = handleFile;
+    fileData.readAsText(file);
   }
 
   useEffect(()=>{
@@ -156,12 +235,19 @@ function App() {
         </>
       </Timeline>
 
+      <FormGroup sx={{paddingLeft: '30px'}}>
+        <FormControlLabel control={<Switch defaultChecked onChange={(e, checked)=>{toggleIdleAnimation(checked)}} />} label="Idle Animation anzeigen" />
+      </FormGroup>
+
+      <input type="file" accept=".json" onChange={(e:any) => 
+            handleChangeFile(e.target.files[0])} /> 
+
       <Box sx={{ padding: '30px' }}>
         <Box sx={{ borderBottom: 1, borderColor: '#f4f4f4' }}>
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
             <Tab label="Effekte" {...a11yProps(0)} />
             <Tab label="Farben" {...a11yProps(1)} />
-            <Tab label="Andere" {...a11yProps(2)} />
+            {/* <Tab label="Andere" {...a11yProps(2)} /> */}
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>

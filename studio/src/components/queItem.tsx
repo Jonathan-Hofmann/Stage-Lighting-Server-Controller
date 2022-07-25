@@ -12,7 +12,7 @@ interface Props{
 }
 
 export const QueItem:React.FC<Props> = (props) => {
-    const aproxTime = calcTime(props.data.id, props.data.speed ?? 100, props.data.loop ?? 1);
+    const aproxTime = calcTime(props.data.id, props.data.speed as number ?? 100, props.data.loop ?? 1);
     return(
         <Tooltip placement="top" arrow title={"Gesamte Zeit: "+aproxTime+" sek. | Länge: "+props.data.speed +"ms | Wdh: "+props.data.loop}>
             <Card elevation={0} sx={{backgroundColor: '#ffffff', borderRadius: '100px'}}>

@@ -24,10 +24,18 @@ var express = require('express'), app = express(), port = 8000;
  */
 
 app.post('/effect/:effect', function (req, res) {
+  console.log("GOT: "+req.params.effect);
   myPort.write(req.params.effect+"\n", ()=>{
     myPort.drain();
   });
   res.status(200).send("EFFEKT DONE.");
+});
+app.post('/color/:effect', function (req, res) {
+  console.log("GOT: "+req.params.effect);
+  myPort.write(req.params.effect+"\n", ()=>{
+    myPort.drain();
+  });
+  res.status(200).send("COLOR DONE.");
 });
 
 parser.on('data', data =>{  // ONLY Works on Windows!

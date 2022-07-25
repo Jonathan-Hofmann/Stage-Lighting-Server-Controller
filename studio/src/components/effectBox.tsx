@@ -5,7 +5,7 @@ import { BiChevronDown } from "react-icons/bi";
 import { calcTime } from "../helper/calcTimes";
 
 export interface i_Effect{
-    speed: number | null;
+    speed: number | null | string;
     name: string;
     loop: number | null;
     id: string;
@@ -51,7 +51,7 @@ export const EffectBox:React.FC<Effect> = (props) => {
     }
 
     useEffect(()=>{
-        const aproxTime = calcTime(props.data.id, speed ?? 100, loop ?? 1);
+        const aproxTime = calcTime(props.data.id, speed as number ?? 100, loop ?? 1);
         setAproxTime(aproxTime.toString());
     }, [speed, loop]);
 
