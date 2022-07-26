@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { MainGrid } from './components/mainGrid';
-import { Button, FormControlLabel, FormGroup, Grid, Stack, Switch, Tab, Tabs, Typography } from '@mui/material';
+import { Button, Divider, FormControlLabel, FormGroup, Grid, IconButton, Stack, Switch, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tabs, Typography } from '@mui/material';
 import axios from 'axios';
 import { Box, Container } from '@mui/system';
 import { EffectBox, i_Effect } from './components/effectBox';
@@ -12,6 +12,7 @@ import { effects, colors } from './constants/config';
 import { ColorBox } from './components/colorBox';
 import { PhotoshopPicker, SketchPicker } from 'react-color';
 import { ColorPickerMain } from './components/colorPicker';
+import { BsTrash, BsTrash2 } from 'react-icons/bs';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -47,8 +48,6 @@ function a11yProps(index: number) {
 }
 
 function App() {
-
-  
 
   const [que, updateQue] = useState<i_Effect[]>([]);
   const [aproxTime, setAproxTime] = useState(0.00);
@@ -99,10 +98,11 @@ function App() {
   const playEffect = async (queElement: any) => {
     return new Promise<void>((resolve, reject)=>{
       if(queElement.id==="COLOR"){
+        console.log("PLAYING COLOR.");
         axios.post("http://localhost:8000/color/C"+queElement.speed);
         setTimeout(()=>{
           resolve();
-        }, 50)
+        }, 200)
       } else{
         let m_speed = "100";
         if(queElement.speed != null){
@@ -126,7 +126,7 @@ function App() {
         }
         axios.post("http://localhost:8000/effect/E"+queElement.id+m_speed+loops);
 
-        let waitingTime = queElement.speed * queElement.loop;
+        let waitingTime = (queElement.speed * queElement.loop);
 
         if(queElement.id === "L" || queElement.id === "M"){
           waitingTime = waitingTime*4;
@@ -138,9 +138,21 @@ function App() {
           waitingTime = _t;
         }
 
-        if(queElement.id === "C"){
+        if(queElement.id === "C" || queElement.id === "N"){
           waitingTime = waitingTime*2;
         }
+
+        if(queElement.id === "E"){
+          waitingTime = 6375 * queElement.loop;
+        }
+
+        if(queElement.id === "B"){
+          waitingTime = queElement.speed * 65;
+        }
+
+        // if(queElement.id === "K"){
+        //   waitingTime = (queElement.speed * queElement.loop) * 2;
+        // }
 
         console.log("Wait: "+waitingTime+"ms für "+queElement.id);
 
@@ -155,6 +167,9 @@ function App() {
   const startShow = async () => {
     console.log("STARTING QUE:");
     console.log(que);
+    
+    axios.post("http://localhost:8000/effect/I0");
+
     for (let i = 0; i < que.length; i++) {
       
       const queElement = que[i];
@@ -217,30 +232,107 @@ function App() {
 
   return (
     <>
-      <Timeline startShow={startShow} aproxTime={aproxTime}>
+    <Container sx={{paddingTop: '30px'}}>
+      <Box display={'flex'} flexDirection="row" justifyContent={'space-between'} alignItems={"center"} sx={{marginBottom: '20px'}}>  
+        <Typography variant='h4' fontWeight={700}>Stage-Timeline</Typography>
+        <Button onClick={startShow} variant='contained'>
+          Show starten
+        </Button>
+      </Box>
+      <Box display={'flex'} flexDirection="row" justifyContent={'space-between'} alignItems={"center"}>  
+        <Typography>Aktuell: {que.length} Keyframes</Typography>
+        
+        <input type="file" accept=".json" onInput={(e:any) => handleChangeFile(e.target.files[0])} onChange={(e:any) => handleChangeFile(e.target.files[0])} /> 
+      </Box>
+      <Divider sx={{margin: '30px 0'}}/>
+
+      {que.length > 0 ?
+      
+        <TableContainer sx={{width: '100%'}}>
+          <Table sx={{width: '100%'}}>
+            <TableHead>
+              <TableCell>
+                Index
+              </TableCell>
+              <TableCell>
+                Name
+              </TableCell>
+              <TableCell>
+                Effekt-ID
+              </TableCell>
+              <TableCell>
+                Wiederholungen
+              </TableCell>
+              <TableCell>
+                Speed / Farb-Code
+              </TableCell>
+              <TableCell>
+                Aktion
+              </TableCell>
+            </TableHead>
+            <TableBody>
+              {que.map((effect, i)=>{
+                return(
+                  // <QueItem index={i} remove={removeFromQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: effect.seconds}} />
+                  <TableRow>
+                    <TableCell>
+                        {i}
+                    </TableCell>
+                    <TableCell>
+                        {effect.name}
+                    </TableCell>
+                    <TableCell>
+                        {effect.id}
+                    </TableCell>
+                    <TableCell>
+                        {effect.loop}
+                    </TableCell>
+                    <TableCell>
+                        {effect.speed}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton onClick={()=>removeFromQue(i)} color="error">
+                        <BsTrash size={'16px'}/>
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        
+      :
+        <Typography color={'text.secondary'}>
+          No Effects in Que.
+        </Typography>
+      }
+      
+    </Container>
+    
+    
+      {/* <Timeline startShow={startShow} aproxTime={aproxTime}>
         <>
           {que.length > 0 ?
-            <>
+            <Stack>
               {que.map((effect, i)=>{
                 return(
                   <QueItem index={i} remove={removeFromQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: effect.seconds}} />
                 )
               })}
-            </>
+            </Stack>
           :
             <Typography color={'text.secondary'}>
               No Effects in Que.
             </Typography>
           }
         </>
-      </Timeline>
+      </Timeline> */}
 
       <FormGroup sx={{paddingLeft: '30px'}}>
         <FormControlLabel control={<Switch defaultChecked onChange={(e, checked)=>{toggleIdleAnimation(checked)}} />} label="Idle Animation anzeigen" />
       </FormGroup>
 
-      <input type="file" accept=".json" onChange={(e:any) => 
-            handleChangeFile(e.target.files[0])} /> 
 
       <Box sx={{ padding: '30px' }}>
         <Box sx={{ borderBottom: 1, borderColor: '#f4f4f4' }}>

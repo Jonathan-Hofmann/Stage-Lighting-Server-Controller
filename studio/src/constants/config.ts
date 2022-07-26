@@ -44,18 +44,6 @@ export const effects = [
       loop: 1,
     },
     {
-      name: 'Left Right',
-      id: 'G',
-      speed: 100,
-      loop: 1,
-    },
-    {
-      name: 'Block',
-      id: 'H',
-      speed: 100,
-      loop: 1,
-    },
-    {
       name: 'Flash - Fade In',
       id: 'I',
       speed: 255,

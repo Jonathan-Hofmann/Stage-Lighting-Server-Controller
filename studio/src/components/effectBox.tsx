@@ -75,16 +75,16 @@ export const EffectBox:React.FC<Effect> = (props) => {
                         <Typography>Einstellungen</Typography>
                         </AccordionSummary>
                         <AccordionDetails sx={{padding: 0}}>
-                            <Stack>
+                            <Stack sx={{marginBottom: '15px'}} >
                                 <TextField size="small" value={loop} onChange={(e)=>{setLoop(parseInt(e.target.value))}} sx={{marginBottom: '15px', marginTop: '5px'}} type="number" id="outlined-basic" label="Wiederholungen" variant="outlined" />
                                 {props.data.speed != null ? <TextField size="small" value={speed} onChange={(e)=>{setSpeed(parseInt(e.target.value))}} sx={{marginBottom: '15px', marginTop: '5px'}} type="number" id="outlined-basic" label="Speed" variant="outlined" /> : <></>}
-                                <Button onClick={()=>{playEffect()}} sx={{marginBottom: '15px'}} variant="outlined">
-                                    abspielen
-                                </Button>
+                                
                             </Stack>
                         </AccordionDetails>
                     </Accordion>
-                    
+                    <Button onClick={()=>{playEffect()}} variant="outlined">
+                        Abspielen
+                    </Button>
                     <Button onClick={()=>{props.addToQue({name: props.data.name, speed: speed, id: props.data.id, loop: loop, seconds: aproxTime})}} sx={{marginTop: '20px'}} variant="contained">
                         EFFEKT HINZUFÜGEN
                     </Button>

@@ -18,14 +18,14 @@
 CRGB leds[2][NUM_LEDS_WINGS];
 int incomingByte = 0;
 
-bool wingsInSync = false;
+bool wingsInSync = true;
 
 CRGB mainColor = CRGB(255,0,0);
 CRGB specialColor = CRGB(0,0,0);
 
 bool showIdleAnim = true;
 
-const unsigned int MAX_MESSAGE_LENGTH = 255;
+const unsigned int MAX_MESSAGE_LENGTH = 300;
 
 void setup() {
   Serial.begin(9600);
@@ -70,17 +70,20 @@ void readData(){
  {
     //Create a place to hold the incoming message
     static char message[MAX_MESSAGE_LENGTH];
+    
     static unsigned int message_pos = 0;
 
     //Read the next available byte in the serial receive buffer
     char inByte = Serial.read();
 
     //Message coming in (check not terminating character) and guard for over message size
-    if ( inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH - 1) )
+    if (inByte != '\n' && (message_pos < MAX_MESSAGE_LENGTH - 1) )
     {
+
       //Add the incoming byte to our message
       Serial.print(inByte);
       message[message_pos] = inByte;
+
       message_pos++;
     }
     //Full message received...
@@ -88,6 +91,21 @@ void readData(){
     {
       //Add null character to string
       message[message_pos] = '\0';
+      // Serial.println(" - DONE!");
+      // bool foundDoubleC = false;
+      // int found_index = 0;
+      // for (int i = 0; i < MAX_MESSAGE_LENGTH; i++)
+      // {
+      //   char tmp = message[i];
+      //   if(tmp == "C" && i > 0){
+      //     foundDoubleC = true;
+      //     message[i-found_index] = 'C';
+      //   }
+      //   if(foundDoubleC == true){
+      //     message[i-found_index] = tmp;
+      //   }
+      // }
+      
 
       // decode message
 
@@ -96,8 +114,8 @@ void readData(){
       m[0] = message[0];
       m[1] = message[1];
 
-      bool inSync = convertIntoToBool(message[7]);
-      wingsInSync = inSync;
+      // bool inSync = convertIntoToBool(message[7]);
+      // wingsInSync = inSync;
 
       if(m[0] == 'E'){
         int speed = String(message[4]).toInt()+(String(message[3]).toInt()*10)+(String(message[2]).toInt()*100);
@@ -178,15 +196,35 @@ void readData(){
         mainColor = CRGB(mainB, mainG, mainR);
         specialColor = CRGB(specialB, specialG, specialR);
 
+        Serial.print(" | Main: ");
+        Serial.print(mainR);
+        Serial.print("(r) ");
+        Serial.print(mainG);
+        Serial.print("(g) ");
+        Serial.print(mainB);
+        Serial.print("(b)  | Special: ");
+        Serial.print(specialR);
+        Serial.print("(r) ");
+        Serial.print(specialG);
+        Serial.print("(g) ");
+        Serial.print(specialB);
+        Serial.println("(b) ");
+
       } else {
 
         // setting main color
         showIdleAnim = convertIntoToBool(message[1]);
 
+        // Serial.flush();
       }
       //Reset for the next message
+
+      // Serial.println(message);
+      // Serial.readBytes(message_test, 18);
+      // Serial.println(message_test);
       message_pos = 0;
-   }
+    }
+   
  }
 }
 
@@ -475,14 +513,6 @@ void oneByOne(int speed) {
     FastLED.show();
     delay(speed);
   }
-  
-  // Now turn the LED off, then pause
-  
-  for (int i = 0; i < NUM_LEDS_WINGS; i++){
-    showColor(i, 0, CRGB::Black);
-  }
-  FastLED.show();
-  delay(speed);
 }
 
 void randomMultiple(int max, int delay_ms) {
