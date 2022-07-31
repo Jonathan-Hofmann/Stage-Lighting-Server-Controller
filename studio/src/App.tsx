@@ -150,10 +150,6 @@ function App() {
           waitingTime = queElement.speed * 65;
         }
 
-        // if(queElement.id === "K"){
-        //   waitingTime = (queElement.speed * queElement.loop) * 2;
-        // }
-
         console.log("Wait: "+waitingTime+"ms für "+queElement.id);
 
         setTimeout(() => {
@@ -210,8 +206,6 @@ function App() {
     updateQue(uploaded_que);
 
     console.log(que);
-
-    // You can set content in state and show it in render.
   }
   
   const handleChangeFile = (file: Blob) => {
@@ -273,7 +267,6 @@ function App() {
             <TableBody>
               {que.map((effect, i)=>{
                 return(
-                  // <QueItem index={i} remove={removeFromQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: effect.seconds}} />
                   <TableRow>
                     <TableCell>
                         {i}
@@ -309,25 +302,6 @@ function App() {
       }
       
     </Container>
-    
-    
-      {/* <Timeline startShow={startShow} aproxTime={aproxTime}>
-        <>
-          {que.length > 0 ?
-            <Stack>
-              {que.map((effect, i)=>{
-                return(
-                  <QueItem index={i} remove={removeFromQue} data={{id: effect.id, name: effect.name, speed: effect.speed, loop: effect.loop, seconds: effect.seconds}} />
-                )
-              })}
-            </Stack>
-          :
-            <Typography color={'text.secondary'}>
-              No Effects in Que.
-            </Typography>
-          }
-        </>
-      </Timeline> */}
 
       <FormGroup sx={{paddingLeft: '30px'}}>
         <FormControlLabel control={<Switch defaultChecked onChange={(e, checked)=>{toggleIdleAnimation(checked)}} />} label="Idle Animation anzeigen" />
@@ -339,7 +313,6 @@ function App() {
           <Tabs value={value} onChange={handleChange} aria-label="basic tabs example">
             <Tab label="Effekte" {...a11yProps(0)} />
             <Tab label="Farben" {...a11yProps(1)} />
-            {/* <Tab label="Andere" {...a11yProps(2)} /> */}
           </Tabs>
         </Box>
         <TabPanel value={value} index={0}>
@@ -360,8 +333,6 @@ function App() {
                 )
             })}
           </Grid>
-          {/* <Typography variant='h5' marginTop={"30px"}>Eigene Farbe</Typography> */}
-          {/* <ColorPickerMain addToQue={addEffectToQue} data={{id: "C", name: "Custom"}}/> */}
         </TabPanel>
         <TabPanel value={value} index={2}>
           Item Three
